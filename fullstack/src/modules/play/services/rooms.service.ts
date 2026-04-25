@@ -1,4 +1,4 @@
-import type { Room } from "../../../../../../monad/monas-fullstack/src/modules/play/types/play.types";
+import type { Room } from "../types/play.types";
 import type { TargetDifficulty } from "@/src/utils/color";
 
 type RoomResponse = { room?: Room; error?: string; code?: string; cancelled?: boolean };
