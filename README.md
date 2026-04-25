@@ -1,10 +1,8 @@
-# Nadient Blitz
+# Nadient
 
-> **"Trust your eyes, outplay the odds."**
+🔗 **Live Demo:** [nadient-game.vercel.app](https://nadient-game.vercel.app/)
 
-Nadient is a Web3 skill-based **color matching** wagering game running on **Monad Testnet**. Players stake mUSDC, then visually match a target color as accurately as possible. Accuracy determines the payout — not luck.
-
-![Nadient Screenshot](/screenshots/1.png)
+![App Screenshot](screenshots/app-screenshot.png)
 
 ---
 
@@ -140,12 +138,6 @@ forge install
 forge test
 forge script script/Deploy.s.sol --rpc-url https://testnet-rpc.monad.xyz --broadcast
 ```
-
----
-
-## Team
-
-Built for the **Monad Blitz Jogja** hackathon.
 
 ---
 
