@@ -12,12 +12,12 @@ Smart contracts untuk **Nadient** — game Web3 skill-based color matching wager
 
 ```
                       ┌──────────────────────────┐
-                      │      NadientGame.sol      │
+                      │      NadientGame.sol     │
                       │                          │
  ┌──────────────┐     │  • depositStake()        │
  │  MockUSDC    │────▶│  • resolveRound()  ◄──── ECDSA Sig
  │  (ERC-20)    │     │  • withdraw()            │
- │              │     │  • refundStake()          │
+ │              │     │  • refundStake()         │
  │  • Faucet    │     │  • seedSoloReserve()     │
  │  • 6 decimal │     │  • emergencyDrain()      │
  │  • 24h CD    │     │                          │
