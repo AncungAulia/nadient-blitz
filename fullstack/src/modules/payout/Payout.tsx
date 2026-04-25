@@ -14,15 +14,13 @@ import UsdcIcon from "@/src/components/elements/UsdcIcon";
 import { formatUsdc } from "@/src/utils/utils";
 import { useWallet } from "@/src/provider/WalletContext";
 import { usePayout } from "./hooks/usePayout";
-import AppLayout from "@/src/components/layouts/AppLayout";
 
 export default function Payout() {
   const { address, isConnected } = useWallet();
   const { claimable, walletBalance, claiming, claim } = usePayout(address);
 
   return (
-    <AppLayout>
-      <div className="max-w-2xl mx-auto page-enter">
+    <div className="max-w-2xl mx-auto page-enter">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-heading text-foreground">Payout</h1>
@@ -84,6 +82,6 @@ export default function Payout() {
           </Card>
         </div>
       </div>
-    </AppLayout>
+    </div>
   );
 }

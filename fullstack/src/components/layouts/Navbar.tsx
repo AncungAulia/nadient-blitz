@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 
 const NAV_LINKS = [
   { href: "/play", label: "Play", icon: Gamepad2 },
-  { href: "/payout", label: "Payout", icon: Vault },
+  { href: "/vault", label: "Payout", icon: Vault },
   { href: "/me", label: "Me", icon: User },
 ];
 
