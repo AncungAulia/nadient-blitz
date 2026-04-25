@@ -28,6 +28,13 @@
 
 ---
 
+## Deployed Contracts (Monad Testnet)
+
+- **MockUSDC:** `0x30Ab7a5742d6dF81dfa4b013ded6A7970fcECa7D`
+- **NadientGame:** `0xA0297a42c73f7FdA848EaAA957B4F08e10AF2bE2`
+
+---
+
 ## Tech Stack
 
 ### Frontend
