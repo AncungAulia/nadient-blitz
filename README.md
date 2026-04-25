@@ -2,27 +2,27 @@
 
 > **"Trust your eyes, outplay the odds."**
 
-Nadient adalah game Web3 skill-based **color matching** berbasis wagering yang berjalan di **Monad Testnet**. Pemain bertaruh mUSDC, lalu mencocokkan warna target secara visual. Akurasi menentukan payout — bukan keberuntungan.
+Nadient is a Web3 skill-based **color matching** wagering game running on **Monad Testnet**. Players stake mUSDC, then visually match a target color as accurately as possible. Accuracy determines the payout — not luck.
 
 ![Nadient Screenshot](/screenshots/1.png)
 
 ---
 
-## Cara Bermain
+## How to Play
 
-1. **Connect wallet** ke Monad Testnet
-2. **Klaim mUSDC** gratis dari faucet (100 mUSDC / 24 jam)
-3. Pilih mode permainan:
-   - **Practice** — latihan gratis, tanpa taruhan
-   - **Solo** — bertaruh mUSDC, lawan color matching system
-   - **Multiplayer** — buat atau join room, lawan teman (2–5 pemain)
-4. Cocokkan warna target seakurat mungkin dalam waktu yang ditentukan
-5. Klaim kemenangan di halaman **Vault**
+1. **Connect your wallet** to Monad Testnet
+2. **Claim free mUSDC** from the faucet (100 mUSDC / 24 hours)
+3. Choose a game mode:
+   - **Practice** — free play, no stakes
+   - **Solo** — stake mUSDC against the color matching system
+   - **Multiplayer** — create or join a room, play against friends (2–5 players)
+4. Match the target color as accurately as possible within the time limit
+5. Claim your winnings on the **Vault** page
 
-### Tier Payout (Solo Mode)
+### Payout Tiers (Solo Mode)
 
-| Tier | Akurasi | Reward |
-|------|---------|--------|
+| Tier | Accuracy | Reward |
+|------|----------|--------|
 | JACKPOT | ≥ 98% | 10.0 mUSDC |
 | GREAT | ≥ 90% | 7.5 mUSDC |
 | GOOD | ≥ 75% | 6.0 mUSDC |
@@ -42,15 +42,15 @@ Nadient adalah game Web3 skill-based **color matching** berbasis wagering yang b
 ### Smart Contracts
 - **Solidity 0.8.24** + **Foundry**
 - **NadientGame.sol** — stake locking, ECDSA-verified round resolution, pull-pattern withdrawal, solo reserve pool
-- **MockUSDC.sol** — ERC-20 test token dengan faucet
+- **MockUSDC.sol** — ERC-20 test token with faucet
 
 ### Infrastructure
 - **Monad Testnet** (Chain ID: 10143)
-- **ECDSA backend signer** — verifikasi hasil round secara off-chain lalu submit ke contract
+- **ECDSA backend signer** — verifies round results off-chain, then submits to the contract
 
 ---
 
-## Arsitektur
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -63,7 +63,7 @@ Nadient adalah game Web3 skill-based **color matching** berbasis wagering yang b
 │  ┌─────────────────────────────────────────────┐   │
 │  │              API Routes                      │   │
 │  │  /rooms/*  /matchmaking/*  /play/*  /vault/* │   │
-│  └──────────────────┬────────────────────────── ┘  │
+│  └──────────────────┬─────────────────────────── ┘  │
 └─────────────────────┼───────────────────────────────┘
                       │
           ┌───────────┼───────────┐
@@ -76,19 +76,19 @@ Nadient adalah game Web3 skill-based **color matching** berbasis wagering yang b
                           MockUSDC.sol
 ```
 
-### Flow Solo Mode
-1. Pemain stake mUSDC → `depositStake()` on-chain
-2. Server generate `roundId` (bytes32)
-3. Pemain submit jawaban → server hitung akurasi
-4. Backend sign hasil → `resolveRound()` on-chain dengan ECDSA signature
-5. Pemain claim dari balance via `withdraw()`
+### Solo Mode Flow
+1. Player stakes mUSDC → `depositStake()` on-chain
+2. Server generates a `roundId` (bytes32)
+3. Player submits their answer → server calculates accuracy
+4. Backend signs the result → `resolveRound()` on-chain with ECDSA signature
+5. Player claims balance via `withdraw()`
 
-### Flow Multiplayer (Friend Room)
-1. Leader buat room dengan kode 6 karakter
-2. Pemain lain join via kode atau link `/play/lobby/[code]`
-3. Semua pemain ready & stake → room otomatis start
-4. Round berjalan serentak, hasil di-resolve on-chain
-5. Winner claim dari Vault
+### Multiplayer Flow (Friend Room)
+1. Leader creates a room with a 6-character code
+2. Other players join via code or the shareable link `/play/lobby/[code]`
+3. All players ready up & stake → room starts automatically
+4. Round runs simultaneously for all players, results resolved on-chain
+5. Winner claims from Vault
 
 ---
 
@@ -101,18 +101,18 @@ Nadient adalah game Web3 skill-based **color matching** berbasis wagering yang b
 
 ---
 
-## Setup & Jalankan Lokal
+## Local Setup
 
 ### Prerequisites
 - Node.js 20+
-- Foundry (untuk smart contract)
-- Akun Supabase + Upstash Redis
+- Foundry (for smart contracts)
+- Supabase account + Upstash Redis
 
 ### Frontend
 
 ```bash
 cd fullstack
-cp .env.example .env   # isi semua variabel
+cp .env.example .env   # fill in all variables
 npm install
 npm run dev
 ```
@@ -120,8 +120,8 @@ npm run dev
 ### Environment Variables
 
 ```env
-SIGNER_PRIVATE_KEY=              # private key backend signer
-BACKEND_PRIVATE_KEY=             # private key untuk operasi backend
+SIGNER_PRIVATE_KEY=              # backend signer private key
+BACKEND_PRIVATE_KEY=             # backend operations private key
 SUPABASE_SERVICE_ROLE_KEY=       # supabase service role key
 NEXT_PUBLIC_SUPABASE_URL=        # supabase project URL
 UPSTASH_REDIS_REST_URL=          # upstash redis URL
@@ -143,12 +143,12 @@ forge script script/Deploy.s.sol --rpc-url https://testnet-rpc.monad.xyz --broad
 
 ---
 
-## Tim
+## Team
 
-Dibuat untuk **Monad Blitz Jogja** hackathon.
+Built for the **Monad Blitz Jogja** hackathon.
 
 ---
 
-## Lisensi
+## License
 
 MIT
