@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 const NAV_LINKS = [
   { href: "/play", label: "Play", icon: Gamepad2 },
   { href: "/payout", label: "Payout", icon: Vault },
-  { href: "/me", label: "Profile", icon: User },
+  { href: "/me", label: "Me", icon: User },
 ];
 
 export default function Navbar() {
