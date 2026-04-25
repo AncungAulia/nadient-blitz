@@ -17,7 +17,7 @@ import {
   useChainId,
 } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { config, monadTestnet } from "@/src/lib/wagmi";
+import { config, monadTestnet } from "@/lib/sc/wagmi";
 
 type WalletState = {
   isConnected: boolean;
