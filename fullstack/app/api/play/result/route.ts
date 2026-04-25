@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { redis, parseRedisJson } from "@/lib/redis";
+import { redis, parseRedisJson } from "@/lib/db/redis";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -9,7 +9,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Missing roundId" }, { status: 400 });
   }
 
-  const result = parseRedisJson<object>(await redis.get(`round:${roundId}:result`));
+  const result = parseRedisJson<object>(
+    await redis.get(`round:${roundId}:result`),
+  );
   if (!result) {
     return NextResponse.json({ resolved: false });
   }

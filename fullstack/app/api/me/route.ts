@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
-import { generateUniqueName } from "@/lib/names";
+import { supabaseAdmin } from "@/lib/db/supabase";
+import { generateUniqueName } from "@/src/utils/names";
 
 function sanitizeDisplayName(value: unknown): string {
   return String(value ?? "")
@@ -38,7 +38,10 @@ export async function GET(request: Request) {
   const walletAddress = searchParams.get("walletAddress");
 
   if (!walletAddress) {
-    return NextResponse.json({ error: "Missing walletAddress" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing walletAddress" },
+      { status: 400 },
+    );
   }
 
   const addr = walletAddress.toLowerCase();
@@ -51,7 +54,8 @@ export async function GET(request: Request) {
 
   const { data: recentRows, error: historyError } = await supabaseAdmin
     .from("round_participants")
-    .select(`
+    .select(
+      `
       accuracy,
       score,
       tier,
@@ -66,7 +70,8 @@ export async function GET(request: Request) {
         created_at,
         resolved_at
       )
-    `)
+    `,
+    )
     .eq("wallet_address", addr)
     .eq("rounds.status", "resolved")
     .order("resolved_at", { foreignTable: "rounds", ascending: false })
@@ -84,9 +89,13 @@ export async function GET(request: Request) {
 
     return {
       round: gameRoundId ? gameRoundId.slice(-4).toUpperCase() : "----",
-      tier: tierLabelFromEnum(typeof row.tier === "number" ? row.tier : Number(row.tier ?? 0)),
+      tier: tierLabelFromEnum(
+        typeof row.tier === "number" ? row.tier : Number(row.tier ?? 0),
+      ),
       mode: modeLabelFromEnum(
-        typeof rounds?.mode === "number" ? rounds.mode : Number(rounds?.mode ?? 0),
+        typeof rounds?.mode === "number"
+          ? rounds.mode
+          : Number(rounds?.mode ?? 0),
       ),
       isFriends: rounds?.source === "private",
       payout: rewardEarned,
@@ -96,8 +105,14 @@ export async function GET(request: Request) {
     };
   });
 
-  const totalEarned = recentRounds.reduce((sum, round) => sum + round.payout, 0);
-  const bestAccuracy = recentRounds.reduce((best, round) => Math.max(best, round.acc), 0);
+  const totalEarned = recentRounds.reduce(
+    (sum, round) => sum + round.payout,
+    0,
+  );
+  const bestAccuracy = recentRounds.reduce(
+    (best, round) => Math.max(best, round.acc),
+    0,
+  );
   let currentWinStreak = 0;
   for (const round of recentRounds) {
     if (round.payout > 0 || round.isWinner) currentWinStreak += 1;
@@ -132,7 +147,10 @@ export async function POST(request: Request) {
     const { walletAddress } = body;
 
     if (!walletAddress) {
-      return NextResponse.json({ error: "Missing walletAddress" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing walletAddress" },
+        { status: 400 },
+      );
     }
 
     const addr = walletAddress.toLowerCase();
@@ -186,13 +204,22 @@ export async function PATCH(request: Request) {
     const nextDisplayName = sanitizeDisplayName(body?.displayName);
 
     if (!walletAddress) {
-      return NextResponse.json({ error: "Missing walletAddress" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing walletAddress" },
+        { status: 400 },
+      );
     }
     if (nextDisplayName.length < 3) {
-      return NextResponse.json({ error: "Name must be at least 3 characters" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Name must be at least 3 characters" },
+        { status: 400 },
+      );
     }
     if (!/^[A-Za-z0-9 _-]+$/.test(nextDisplayName)) {
-      return NextResponse.json({ error: "Name may only contain letters, numbers, spaces, _ or -" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Name may only contain letters, numbers, spaces, _ or -" },
+        { status: 400 },
+      );
     }
 
     const addr = walletAddress.toLowerCase();
@@ -206,15 +233,21 @@ export async function PATCH(request: Request) {
       .maybeSingle();
 
     if (conflict) {
-      return NextResponse.json({ error: "That name is already used by another wallet" }, { status: 409 });
+      return NextResponse.json(
+        { error: "That name is already used by another wallet" },
+        { status: 409 },
+      );
     }
 
     const { data, error } = await supabaseAdmin
       .from("players")
-      .upsert({
-        wallet_address: addr,
-        display_name: nextDisplayName,
-      }, { onConflict: "wallet_address" })
+      .upsert(
+        {
+          wallet_address: addr,
+          display_name: nextDisplayName,
+        },
+        { onConflict: "wallet_address" },
+      )
       .select()
       .single();
 

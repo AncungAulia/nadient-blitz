@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/db/supabase";
 
 export async function GET(request: Request) {
   try {
@@ -23,13 +23,17 @@ export async function GET(request: Request) {
     for (const a of addresses) names[a] = null;
     for (const row of data ?? []) {
       if (row.wallet_address) {
-        names[row.wallet_address as string] = (row.display_name as string) ?? null;
+        names[row.wallet_address as string] =
+          (row.display_name as string) ?? null;
       }
     }
 
     return NextResponse.json({ names });
   } catch (err: any) {
     console.error("players/names error:", err);
-    return NextResponse.json({ names: {}, error: err?.message ?? "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { names: {}, error: err?.message ?? "Server error" },
+      { status: 500 },
+    );
   }
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { redis } from "@/lib/redis";
+import { redis } from "@/lib/db/redis";
 
 const ONLINE_KEY = "online:players";
 const TTL_MS = 60_000; // player considered online if heartbeat < 60s ago
@@ -13,7 +13,10 @@ export async function GET(request: Request) {
 
   // Register player if walletAddress provided
   if (walletAddress) {
-    await redis.zadd(ONLINE_KEY, { score: now, member: walletAddress.toLowerCase() });
+    await redis.zadd(ONLINE_KEY, {
+      score: now,
+      member: walletAddress.toLowerCase(),
+    });
   }
 
   // Remove stale entries

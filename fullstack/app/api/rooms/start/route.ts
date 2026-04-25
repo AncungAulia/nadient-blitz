@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { redis } from "@/lib/redis";
+import { redis } from "@/lib/db/redis";
 import { getRoom, saveRoom, isLeader, generateRoundId } from "@/lib/rooms";
-import { supabaseAdmin } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/db/supabase";
 
 export async function POST(req: Request) {
   try {
@@ -10,28 +10,47 @@ export async function POST(req: Request) {
     const codeRaw = body?.code as string | undefined;
 
     if (!walletAddress || !codeRaw) {
-      return NextResponse.json({ error: "Missing walletAddress or code" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing walletAddress or code" },
+        { status: 400 },
+      );
     }
     const code = codeRaw.trim().toUpperCase();
 
     const room = await getRoom(code);
-    if (!room) return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    if (!room)
+      return NextResponse.json({ error: "Room not found" }, { status: 404 });
     if (!isLeader(room, walletAddress)) {
-      return NextResponse.json({ error: "Only the leader can start the room" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Only the leader can start the room" },
+        { status: 403 },
+      );
     }
     if (room.status !== "lobby") {
-      return NextResponse.json({ error: "Room is not in the lobby" }, { status: 409 });
+      return NextResponse.json(
+        { error: "Room is not in the lobby" },
+        { status: 409 },
+      );
     }
     if (room.players.length < room.maxPlayers) {
-      return NextResponse.json({
-        error: `Room is not full yet (${room.players.length}/${room.maxPlayers})`,
-      }, { status: 409 });
+      return NextResponse.json(
+        {
+          error: `Room is not full yet (${room.players.length}/${room.maxPlayers})`,
+        },
+        { status: 409 },
+      );
     }
     if (!room.players.every((p) => p.status === "ready")) {
-      return NextResponse.json({ error: "All players must be ready" }, { status: 409 });
+      return NextResponse.json(
+        { error: "All players must be ready" },
+        { status: 409 },
+      );
     }
     if (room.paid && !room.players.every((p) => p.staked)) {
-      return NextResponse.json({ error: "All players must stake before starting" }, { status: 409 });
+      return NextResponse.json(
+        { error: "All players must stake before starting" },
+        { status: 409 },
+      );
     }
 
     if (!room.roundId) room.roundId = generateRoundId();

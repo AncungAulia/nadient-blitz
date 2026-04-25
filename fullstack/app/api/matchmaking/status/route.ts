@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { redis, parseRedisJson } from '@/lib/redis';
-import { tryMatch, QUEUE_TTL } from '../join/route';
+import { NextResponse } from "next/server";
+import { redis, parseRedisJson } from "@/lib/db/redis";
+import { tryMatch, QUEUE_TTL } from "../join/route";
 
 function getRequiredPlayers(mode: number) {
   if (mode === 1) return 2;
@@ -11,14 +11,17 @@ function getRequiredPlayers(mode: number) {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const walletAddress = searchParams.get('walletAddress');
-    const modeStr = searchParams.get('mode');
+    const walletAddress = searchParams.get("walletAddress");
+    const modeStr = searchParams.get("mode");
     const mode = modeStr !== null ? Number(modeStr) : null;
-    const roomCodeParam = searchParams.get('roomCode');
+    const roomCodeParam = searchParams.get("roomCode");
     const roomCode = roomCodeParam ? roomCodeParam.trim().toUpperCase() : null;
 
     if (!walletAddress) {
-      return NextResponse.json({ error: 'Missing walletAddress' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing walletAddress" },
+        { status: 400 },
+      );
     }
 
     // Heartbeat: refresh TTL to prove player is still alive.
@@ -31,19 +34,29 @@ export async function GET(request: Request) {
       await redis.expire(playerKey, QUEUE_TTL);
     } else if (mode !== null) {
       // Key expired but player is actively polling — put them back
-      const queueKey = roomCode ? `queue:room:${roomCode}` : `queue:mode:${mode}`;
+      const queueKey = roomCode
+        ? `queue:room:${roomCode}`
+        : `queue:mode:${mode}`;
       const stillInQueue = await redis.sismember(queueKey, walletAddress);
       if (stillInQueue) {
         await redis.set(
           playerKey,
-          JSON.stringify({ walletAddress, mode, roomCode, joinedAt: Date.now(), reregistered: true }),
+          JSON.stringify({
+            walletAddress,
+            mode,
+            roomCode,
+            joinedAt: Date.now(),
+            reregistered: true,
+          }),
           { ex: QUEUE_TTL },
         );
       }
     }
 
     // Check if already matched
-    const matchData = parseRedisJson<object>(await redis.get(`match:${walletAddress}`));
+    const matchData = parseRedisJson<object>(
+      await redis.get(`match:${walletAddress}`),
+    );
     if (matchData) {
       return NextResponse.json({ matched: true, ...matchData });
     }
@@ -51,7 +64,9 @@ export async function GET(request: Request) {
     // Count alive players and attempt match when enough are present
     let queueCount = 0;
     if (mode !== null) {
-      const queueKey = roomCode ? `queue:room:${roomCode}` : `queue:mode:${mode}`;
+      const queueKey = roomCode
+        ? `queue:room:${roomCode}`
+        : `queue:mode:${mode}`;
       const required = getRequiredPlayers(mode);
       const playersInQueue = await redis.smembers(queueKey);
 
@@ -73,7 +88,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ matched: false, queueCount });
   } catch (error: unknown) {
     const e = error as Error;
-    console.error('Matchmaking Status Error:', e);
+    console.error("Matchmaking Status Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
